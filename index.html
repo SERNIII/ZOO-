@@ -126,6 +126,39 @@
             font-weight: bold;
         }
 
+
+        .status-renting {
+            background: #22c55e;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .status-expired {
+            background: #ef4444;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .status-none {
+            background: #d1d5db;
+            color: #374151;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+        }
         .action-buttons {
             display: flex;
             gap: 5px;
@@ -452,6 +485,7 @@
                         <th>เบอร์ไอดี</th>
                         <th>แพ็กเกจ</th>
                         <th>วันที่ใช้</th>
+                        <th>สถานะ</th>
                         <th>ควบคุม</th>
                     </tr>
                 </thead>
@@ -668,7 +702,9 @@
                     60 *
                     1000,
 
-                expire: null
+                expire: null,
+
+                status: "none"
 
             });
 
@@ -721,6 +757,18 @@
             saveData();
             render();
 
+        }
+
+        function toggleStatus(index) {
+            const c = customers[index];
+            if (c.status === 'none' || !c.status) {
+                c.status = 'renting';
+            } else if (c.status === 'renting') {
+                c.status = 'expired';
+            } else {
+                c.status = 'none';
+            }
+            saveData();
         }
 
         function deleteCustomer(index) {
@@ -959,6 +1007,14 @@
 <td>${c.packageName}</td>
 
 <td>${c.days ? (c.days.length === 5 ? 'วันที่ 1-5' : 'วันที่ ' + c.days.join(', ')) : '-'}</td>
+
+<td>
+<button
+class="${c.status === 'renting' ? 'status-renting' : c.status === 'expired' ? 'status-expired' : 'status-none'}"
+onclick="toggleStatus(${index})">
+${c.status === 'renting' ? '🟢 เช่าอยู่' : c.status === 'expired' ? '🔴 หมดเวลา' : '⚪ ยังไม่เลือก'}
+</button>
+</td>
 
 <td>
 
