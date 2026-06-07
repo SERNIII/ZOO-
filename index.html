@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ZOO TYCOON</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #edf2f7;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #1e3a8a;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .1);
+        }
+
+        .form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        input,
+        select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        input {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background: #2563eb;
+        }
+
+        .start-btn {
+            background: #22c55e;
+        }
+
+        .stop-btn {
+            background: #f59e0b;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 14px;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .active {
+            background: #22c55e;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .paused {
+            background: #f59e0b;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .expired {
+            background: #ef4444;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .stats {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media(max-width:768px) {
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+        }
+
+        .zoo-status-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .1);
+            margin-bottom: 20px;
+        }
+
+        .zoo-status-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+
+        .zoo-slot-summary {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .zoo-slot-box {
+            background: #f0f9ff;
+            border: 2px solid #bae6fd;
+            border-radius: 12px;
+            padding: 12px 18px;
+            text-align: center;
+            min-width: 130px;
+        }
+
+        .zoo-slot-box.full {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .zoo-slot-box.ok {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .zoo-slot-box-label {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .zoo-slot-box-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        .zoo-slot-box-value.red { color: #ef4444; }
+        .zoo-slot-box-value.green { color: #22c55e; }
+
+        .slot-grid {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .slot-block {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            cursor: default;
+        }
+
+        .slot-block.full-slot {
+            background: #ef4444;
+        }
+
+        .slot-block.half-slot {
+            background: linear-gradient(to bottom, #f59e0b 50%, #f59e0b 50%);
+            border: 2px solid #f59e0b;
+        }
+
+        .slot-block.half-used-top {
+            background: linear-gradient(to bottom, #ef4444 50%, #22c55e 50%);
+        }
+
+        .slot-block.half-used-bottom {
+            background: linear-gradient(to bottom, #22c55e 50%, #ef4444 50%);
+        }
+
+        .slot-block.free {
+            background: #22c55e;
+        }
+
+        .slot-block.partial {
+            background: #f59e0b;
+        }
+
+        .zoo-available-info {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .zoo-available-info .row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .dot.green { background: #22c55e; }
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #f59e0b; }
+
+        .legend {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .day-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .day-card {
+            flex: 1;
+            min-width: 150px;
+            border-radius: 14px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .day-card.today {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .day-card-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .today-badge {
+            background: #2563eb;
+            color: white;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 20px;
+        }
+
+        .day-slots-row {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .day-slot-block {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .day-slot-block.free { background: #22c55e; }
+        .day-slot-block.full { background: #ef4444; }
+        .day-slot-block.re-block {
+            flex-direction: column;
+            gap: 0;
+            padding: 1px;
+            font-size: 8px;
+        }
+
+        .re-half {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+        }
+
+        .day-re-info {
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .day-slot-count {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .tag-free { color: #16a34a; font-weight: bold; }
+        .tag-full { color: #dc2626; font-weight: bold; }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1 class="title">
+            ZOO TYCOON
+        </h1>
+
+        <div class="zoo-status-card" id="zooStatusCard">
+            <div class="zoo-status-title">🦁 สถานะ ZOO Slot แยกตามวัน (ทั้งหมด 8 Slot / วัน)</div>
+            <div id="dayGrid"></div>
+            <div class="legend" style="margin-top:12px">
+                <div class="legend-item"><span class="dot green"></span> ว่าง</div>
+                <div class="legend-item"><span class="dot red"></span> เต็ม</div>
+                <div class="legend-item"><span class="dot yellow"></span> รีครึ่ง slot</div>
+            </div>
+        </div>
+
+        <div class="card">
+
+            <div class="stats">
+                จำนวนลูกค้า :
+                <span id="totalUsers">0</span>
+            </div>
+
+            <div class="form">
+
+                <input type="text" id="name" placeholder="ชื่อลูกค้า">
+
+                <input type="text" id="number" placeholder="เบอร์ไอดี">
+
+                <select id="package" onchange="checkSlotWarning()">
+
+                    <option value="1">
+                        รายวัน (1 วัน)
+                    </option>
+
+                    <option value="5">
+                        ราย 5 วัน
+                    </option>
+
+                    <option value="morning">
+                        รีเช้า (06:00)
+                    </option>
+
+                    <option value="evening">
+                        รีเย็น (18:00)
+                    </option>
+
+                </select>
+
+                <select id="startDay" onchange="checkSlotWarning()">
+                    <option value="1">วันที่ 1</option>
+                    <option value="2">วันที่ 2</option>
+                    <option value="3">วันที่ 3</option>
+                    <option value="4">วันที่ 4</option>
+                    <option value="5">วันที่ 5</option>
+                </select>
+
+                <button class="add-btn" onclick="addCustomer()">
+                    เพิ่มลูกค้า
+                </button>
+
+            </div>
+
+            <div id="slotWarning" style="margin-bottom:14px;display:none;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:bold;"></div>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ชื่อลูกค้า</th>
+                        <th>เบอร์ไอดี</th>
+                        <th>แพ็กเกจ</th>
+                        <th>วันที่ใช้</th>
+                        <th>ควบคุม</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAA5HgEJjLg8ji__SztCntxD6AyrHcuG70",
+            authDomain: "zoov-1e6ae.firebaseapp.com",
+            databaseURL: "https://zoov-1e6ae-default-rtdb.firebaseio.com",
+            projectId: "zoov-1e6ae",
+            storageBucket: "zoov-1e6ae.firebasestorage.app",
+            messagingSenderId: "734128071587",
+            appId: "1:734128071587:web:3f5dbdf636ac7d022c3016",
+            measurementId: "G-X724K04LVT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const customersRef = ref(db, 'customers');
+
+        window._db = db;
+        window._customersRef = customersRef;
+        window._set = set;
+        window._ref = ref;
+
+        // Listen for real-time changes from Firebase
+        onValue(customersRef, (snapshot) => {
+            const data = snapshot.val();
+            customers = data ? data : [];
+            render();
+        });
+    </script>
+
+    <script>
+
+        let customers = [];
+
+        function saveData() {
+            window._set(window._customersRef, customers);
+        }
+
+        // คำนวณข้อมูล slot ของวันที่ d
+        function getDayData(d) {
+            const TOTAL_SLOTS = 8;
+            let fullSlots = 0, morningCount = 0, eveningCount = 0;
+
+            customers.forEach(c => {
+                let remain = c.running ? (c.expire - Date.now()) : c.remainMs;
+                if (remain <= 0) return;
+                let affectedDays = c.days || (c.duration == 5 ? [1,2,3,4,5] : [1]);
+                if (!affectedDays.includes(d)) return;
+
+                if (c.packageName === "รีเช้า (06:00)") morningCount++;
+                else if (c.packageName === "รีเย็น (18:00)") eveningCount++;
+                else fullSlots++;
+            });
+
+            const paired = Math.min(morningCount, eveningCount);
+            const morningOnly = morningCount - paired;
+            const eveningOnly = eveningCount - paired;
+            const usedSlots = fullSlots + paired + (morningOnly * 0.5) + (eveningOnly * 0.5);
+            const freeSlots = TOTAL_SLOTS - usedSlots;
+
+            return { fullSlots, morningCount, eveningCount, usedSlots, freeSlots, TOTAL_SLOTS };
+        }
+
+        function checkSlotWarning() {
+            const packageType = document.getElementById("package").value;
+            const startDay = parseInt(document.getElementById("startDay").value);
+            const warn = document.getElementById("slotWarning");
+
+            // ราย 5 วัน ตรวจทุกวัน
+            const daysToCheck = packageType === "5" ? [1,2,3,4,5] : [startDay];
+
+            let blocked = [];
+            let warnings = [];
+
+            daysToCheck.forEach(d => {
+                const dd = getDayData(d);
+
+                if (packageType === "morning") {
+                    // รีเช้า: ต้องมี slot ว่างอย่างน้อย 0.5 และรีเช้าใน slot นั้นยังว่าง
+                    // slot ที่รีเช้าว่าง = TOTAL_SLOTS - fullSlots - morningCount
+                    const mFreeSlots = dd.TOTAL_SLOTS - dd.fullSlots - dd.morningCount;
+                    if (mFreeSlots <= 0) blocked.push(d);
+                    else if (mFreeSlots <= 2) warnings.push(`วันที่ ${d}: รีเช้าว่างอีก ${mFreeSlots} slot`);
+                } else if (packageType === "evening") {
+                    const eFreeSlots = dd.TOTAL_SLOTS - dd.fullSlots - dd.eveningCount;
+                    if (eFreeSlots <= 0) blocked.push(d);
+                    else if (eFreeSlots <= 2) warnings.push(`วันที่ ${d}: รีเย็นว่างอีก ${eFreeSlots} slot`);
+                } else {
+                    // รายวัน / ราย 5 วัน ต้องการ 1 full slot
+                    if (dd.freeSlots < 1) blocked.push(d);
+                    else if (dd.freeSlots <= 2) warnings.push(`วันที่ ${d}: ว่างอีก ${dd.freeSlots} slot`);
+                }
+            });
+
+            if (blocked.length > 0) {
+                warn.style.display = "block";
+                warn.style.background = "#fef2f2";
+                warn.style.border = "2px solid #fca5a5";
+                warn.style.color = "#dc2626";
+                warn.innerHTML = `❌ วันที่ ${blocked.join(", ")} เต็มแล้ว! ไม่สามารถเพิ่มลูกค้าได้`;
+            } else if (warnings.length > 0) {
+                warn.style.display = "block";
+                warn.style.background = "#fffbeb";
+                warn.style.border = "2px solid #fcd34d";
+                warn.style.color = "#b45309";
+                warn.innerHTML = `⚠️ ใกล้เต็มแล้ว! ${warnings.join(" | ")}`;
+            } else {
+                warn.style.display = "none";
+            }
+        }
+
+        function addCustomer() {
+
+            const name =
+                document.getElementById("name")
+                    .value.trim();
+
+            const number =
+                document.getElementById("number")
+                    .value.trim();
+
+            const packageType =
+                document.getElementById("package")
+                    .value;
+
+            const startDay = parseInt(document.getElementById("startDay").value);
+
+            let duration;
+            let packageName;
+            let days; // วันที่ลูกค้าครอบครอง slot
+
+            if (packageType == "1") {
+                duration = 1;
+                packageName = "รายวัน";
+                days = [startDay];
+            }
+            else if (packageType == "5") {
+                duration = 5;
+                packageName = "ราย 5 วัน";
+                days = [1, 2, 3, 4, 5];
+            }
+            else if (packageType == "morning") {
+                duration = 0.5;
+                packageName = "รีเช้า (06:00)";
+                days = [startDay];
+            }
+            else if (packageType == "evening") {
+                duration = 0.5;
+                packageName = "รีเย็น (18:00)";
+                days = [startDay];
+            }
+
+            if (!name || !number) {
+                alert("กรอกข้อมูลให้ครบ");
+                return;
+            }
+
+            // ตรวจสอบว่า slot เต็มหรือยัง
+            let blockedDays = [];
+            days.forEach(d => {
+                const dd = getDayData(d);
+                if (packageType === "morning") {
+                    const mFree = dd.TOTAL_SLOTS - dd.fullSlots - dd.morningCount;
+                    if (mFree <= 0) blockedDays.push(d);
+                } else if (packageType === "evening") {
+                    const eFree = dd.TOTAL_SLOTS - dd.fullSlots - dd.eveningCount;
+                    if (eFree <= 0) blockedDays.push(d);
+                } else {
+                    if (dd.freeSlots < 1) blockedDays.push(d);
+                }
+            });
+
+            if (blockedDays.length > 0) {
+                const warn = document.getElementById("slotWarning");
+                warn.style.display = "block";
+                warn.style.background = "#fef2f2";
+                warn.style.border = "2px solid #fca5a5";
+                warn.style.color = "#dc2626";
+                warn.innerHTML = `❌ วันที่ ${blockedDays.join(", ")} เต็มแล้ว! ไม่สามารถเพิ่มลูกค้าได้`;
+                return;
+            }
+
+            customers.push({
+
+                name,
+                number,
+
+                duration,
+                packageName,
+                days,
+
+                running: false,
+
+                remainMs:
+                    duration *
+                    24 *
+                    60 *
+                    60 *
+                    1000,
+
+                expire: null
+
+            });
+
+            saveData();
+
+            document.getElementById("name").value = "";
+            document.getElementById("number").value = "";
+            document.getElementById("slotWarning").style.display = "none";
+
+            render();
+
+        }
+
+        function startTimer(index) {
+
+            let c = customers[index];
+
+            if (c.running) return;
+
+            if (c.remainMs <= 0) return;
+
+            c.running = true;
+
+            c.expire =
+                Date.now() + c.remainMs;
+
+            saveData();
+            render();
+
+        }
+
+        function stopTimer(index) {
+
+            let c = customers[index];
+
+            if (!c.running) return;
+
+            c.remainMs =
+                c.expire - Date.now();
+
+            if (c.remainMs < 0) {
+
+                c.remainMs = 0;
+
+            }
+
+            c.running = false;
+            c.expire = null;
+
+            saveData();
+            render();
+
+        }
+
+        function deleteCustomer(index) {
+
+            if (confirm("ต้องการลบลูกค้าคนนี้?")) {
+
+                customers.splice(index, 1);
+
+                saveData();
+                render();
+
+            }
+
+        }
+
+        function formatTime(ms) {
+
+            let days =
+                Math.floor(ms / 86400000);
+
+            let hours =
+                Math.floor(
+                    (ms % 86400000)
+                    / 3600000
+                );
+
+            let mins =
+                Math.floor(
+                    (ms % 3600000)
+                    / 60000
+                );
+
+            let secs =
+                Math.floor(
+                    (ms % 60000)
+                    / 1000
+                );
+
+            return `${days} วัน ${hours} ชม ${mins} นาที ${secs} วิ`;
+
+        }
+
+        function renderZooStatus() {
+            const TOTAL_SLOTS = 8;
+
+            // สร้าง structure แยกตามวัน 1-5
+            // แต่ละวันเก็บ: fullSlots[], morningList[], eveningList[]
+            // รีเช้า+รีเย็นจับคู่ใน slot เดียวกันได้ถ้าเป็น slot เดียวกัน
+            let dayData = {};
+            for (let d = 1; d <= 5; d++) {
+                dayData[d] = { fullSlots: 0, morningCount: 0, eveningCount: 0 };
+            }
+
+            customers.forEach(c => {
+                let remain = c.running ? (c.expire - Date.now()) : c.remainMs;
+                if (remain <= 0) return;
+
+                let affectedDays = c.days || [];
+                if (!c.days) {
+                    affectedDays = c.duration == 5 ? [1,2,3,4,5] : [1];
+                }
+
+                affectedDays.forEach(d => {
+                    if (!dayData[d]) return;
+                    if (c.packageName === "รีเช้า (06:00)") {
+                        dayData[d].morningCount++;
+                    } else if (c.packageName === "รีเย็น (18:00)") {
+                        dayData[d].eveningCount++;
+                    } else {
+                        dayData[d].fullSlots++;
+                    }
+                });
+            });
+
+            let html = '<div class="day-grid">';
+
+            for (let d = 1; d <= 5; d++) {
+                const dd = dayData[d];
+
+                // จับคู่ slot รี:
+                // รีเช้า + รีเย็น ใน slot เดียวกัน = paired slots
+                // ถ้ามีรีเช้าเกิน หรือ รีเย็นเกิน = slot ที่มีแค่ครึ่งเดียว
+                const paired = Math.min(dd.morningCount, dd.eveningCount); // slot ที่มีทั้งคู่
+                const morningOnly = dd.morningCount - paired;               // slot ที่มีแค่รีเช้า
+                const eveningOnly = dd.eveningCount - paired;               // slot ที่มีแค่รีเย็น
+
+                // นับ slot ที่ใช้ไป
+                // full slot = 1, paired re = 1, morningOnly = 0.5, eveningOnly = 0.5
+                const usedSlots = dd.fullSlots + paired + (morningOnly * 0.5) + (eveningOnly * 0.5);
+                const freeSlots = TOTAL_SLOTS - usedSlots;
+
+                // วาด blocks
+                let blocksHtml = '';
+                let slotNum = 1;
+
+                // full slots
+                for (let i = 0; i < dd.fullSlots; i++) {
+                    blocksHtml += `<div class="day-slot-block full" title="Slot ${slotNum}: เต็มวัน">${slotNum}</div>`;
+                    slotNum++;
+                }
+
+                // paired slots (มีทั้งรีเช้าและรีเย็น)
+                for (let i = 0; i < paired; i++) {
+                    blocksHtml += `
+                        <div class="day-slot-block re-block" title="Slot ${slotNum}: รีเช้า+รีเย็น เต็มทั้งคู่">
+                            <div class="re-half" style="background:#ef4444">🌅</div>
+                            <div class="re-half" style="background:#ef4444">🌆</div>
+                        </div>`;
+                    slotNum++;
+                }
+
+                // morningOnly slots (รีเช้าเต็ม รีเย็นว่าง)
+                for (let i = 0; i < morningOnly; i++) {
+                    blocksHtml += `
+                        <div class="day-slot-block re-block" title="Slot ${slotNum}: รีเช้าเต็ม / รีเย็นว่าง">
+                            <div class="re-half" style="background:#ef4444">🌅</div>
+                            <div class="re-half" style="background:#22c55e">🌆</div>
+                        </div>`;
+                    slotNum++;
+                }
+
+                // eveningOnly slots (รีเช้าว่าง รีเย็นเต็ม)
+                for (let i = 0; i < eveningOnly; i++) {
+                    blocksHtml += `
+                        <div class="day-slot-block re-block" title="Slot ${slotNum}: รีเช้าว่าง / รีเย็นเต็ม">
+                            <div class="re-half" style="background:#22c55e">🌅</div>
+                            <div class="re-half" style="background:#ef4444">🌆</div>
+                        </div>`;
+                    slotNum++;
+                }
+
+                // free slots ที่เหลือ
+                for (let i = slotNum; i <= TOTAL_SLOTS; i++) {
+                    blocksHtml += `<div class="day-slot-block free" title="Slot ${i}: ว่าง">${i}</div>`;
+                }
+
+                // สรุปรีข้อความ
+                const mFree = dd.morningCount === 0
+                    ? `<span class="tag-free">🌅 รีเช้า ว่าง</span>`
+                    : `<span class="tag-full">🌅 รีเช้า ${dd.morningCount} คน (ว่าง ${TOTAL_SLOTS - dd.fullSlots - dd.morningCount} slot)</span>`;
+                const eFree = dd.eveningCount === 0
+                    ? `<span class="tag-free">🌆 รีเย็น ว่าง</span>`
+                    : `<span class="tag-full">🌆 รีเย็น ${dd.eveningCount} คน (ว่าง ${TOTAL_SLOTS - dd.fullSlots - dd.eveningCount} slot)</span>`;
+
+                html += `
+                    <div class="day-card">
+                        <div class="day-card-title">วันที่ ${d}</div>
+                        <div class="day-slot-count">
+                            ใช้ไป <strong>${usedSlots}</strong> | ว่าง <strong style="color:${freeSlots>0?'#16a34a':'#dc2626'}">${freeSlots}</strong> slot
+                        </div>
+                        <div class="day-slots-row">${blocksHtml}</div>
+                        <div class="day-re-info">${mFree}<br>${eFree}</div>
+                    </div>`;
+            }
+
+            html += '</div>';
+            document.getElementById("dayGrid").innerHTML = html;
+        }
+
+        function render() {
+
+            let html = "";
+
+            customers.forEach((c, index) => {
+
+                let remain;
+
+                if (c.running) {
+
+                    remain =
+                        c.expire - Date.now();
+
+                    if (remain <= 0) {
+
+                        remain = 0;
+
+                        c.running = false;
+                        c.expire = null;
+                        c.remainMs = 0;
+
+                        saveData();
+
+                    }
+
+                } else {
+
+                    remain = c.remainMs;
+
+                }
+
+                if (!c.packageName) {
+
+                    if (c.duration == 1) {
+
+                        c.packageName = "รายวัน";
+
+                    } else if (c.duration == 5) {
+
+                        c.packageName = "ราย 5 วัน";
+
+                    } else {
+
+                        c.packageName = "รายรี";
+
+                    }
+
+                }
+
+                let status;
+
+                if (remain <= 0) {
+
+                    status =
+                        '<span class="expired">หมดอายุ</span>';
+
+                } else if (c.running) {
+
+                    status =
+                        '<span class="active">กำลังใช้งาน</span>';
+
+                } else {
+
+                    status =
+                        '<span class="paused">รอเริ่ม</span>';
+
+                }
+
+                html += `
+
+<tr>
+
+<td>${c.name}</td>
+
+<td>${c.number}</td>
+
+<td>${c.packageName}</td>
+
+<td>${c.days ? (c.days.length === 5 ? 'วันที่ 1-5' : 'วันที่ ' + c.days.join(', ')) : '-'}</td>
+
+<td>
+
+<div class="action-buttons">
+
+<button
+class="delete-btn"
+onclick="deleteCustomer(${index})">
+❌ ลบ
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`;
+
+            });
+
+            document.getElementById(
+                "tableBody"
+            ).innerHTML = html;
+
+            document.getElementById(
+                "totalUsers"
+            ).textContent =
+                customers.length;
+
+            renderZooStatus();
+
+        }
+
+        // Update timers every second (does NOT re-fetch from Firebase, just re-renders locally)
+        setInterval(() => {
+            let changed = false;
+            customers.forEach(c => {
+                if (c.running && c.expire - Date.now() <= 0) {
+                    c.running = false;
+                    c.expire = null;
+                    c.remainMs = 0;
+                    changed = true;
+                }
+            });
+            if (changed) saveData();
+            else render();
+        }, 1000);
+
+    </script>
+
+</body>
+
+</html>
