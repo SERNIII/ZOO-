@@ -127,6 +127,49 @@
         }
 
 
+        .day-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .day-tab {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid #2563eb;
+            background: white;
+            color: #2563eb;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .day-tab.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .delete-all-btn {
+            margin-left: auto;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid #ef4444;
+            background: white;
+            color: #ef4444;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-all-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
         .status-renting {
             background: #22c55e;
             color: white;
@@ -477,6 +520,15 @@
 
             <div id="slotWarning" style="margin-bottom:14px;display:none;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:bold;"></div>
 
+            <div class="day-tabs">
+                <button class="day-tab active" onclick="selectDay(1)">วันที่ 1</button>
+                <button class="day-tab" onclick="selectDay(2)">วันที่ 2</button>
+                <button class="day-tab" onclick="selectDay(3)">วันที่ 3</button>
+                <button class="day-tab" onclick="selectDay(4)">วันที่ 4</button>
+                <button class="day-tab" onclick="selectDay(5)">วันที่ 5</button>
+                <button class="delete-all-btn" onclick="deleteAllCustomers()">🗑️ ลบทั้งหมด</button>
+            </div>
+
             <table>
 
                 <thead>
@@ -484,7 +536,6 @@
                         <th>ชื่อลูกค้า</th>
                         <th>เบอร์ไอดี</th>
                         <th>แพ็กเกจ</th>
-                        <th>วันที่ใช้</th>
                         <th>สถานะ</th>
                         <th>ควบคุม</th>
                     </tr>
@@ -702,9 +753,7 @@
                     60 *
                     1000,
 
-                expire: null,
-
-                status: "none"
+                expire: null
 
             });
 
@@ -757,18 +806,6 @@
             saveData();
             render();
 
-        }
-
-        function toggleStatus(index) {
-            const c = customers[index];
-            if (c.status === 'none' || !c.status) {
-                c.status = 'renting';
-            } else if (c.status === 'renting') {
-                c.status = 'expired';
-            } else {
-                c.status = 'none';
-            }
-            saveData();
         }
 
         function deleteCustomer(index) {
@@ -928,122 +965,75 @@
             document.getElementById("dayGrid").innerHTML = html;
         }
 
+        let selectedDay = 1;
+
+        function selectDay(day) {
+            selectedDay = day;
+            document.querySelectorAll('.day-tab').forEach((btn, i) => {
+                btn.classList.toggle('active', i + 1 === day);
+            });
+            render();
+        }
+
+        function toggleStatus(index) {
+            const c = customers[index];
+            if (!c.status || c.status === 'none') {
+                c.status = 'renting';
+            } else if (c.status === 'renting') {
+                c.status = 'expired';
+            } else {
+                c.status = 'none';
+            }
+            saveData();
+        }
+
+        function deleteAllCustomers() {
+            if (confirm('ลบข้อมูลลูกค้าทั้งหมดใช่ไหม?')) {
+                customers = [];
+                saveData();
+            }
+        }
+
         function render() {
 
-            let html = "";
+            const filtered = customers
+                .map((c, i) => ({ c, i }))
+                .filter(({ c }) => c.days && c.days.includes(selectedDay));
 
-            customers.forEach((c, index) => {
+            let html = '';
 
-                let remain;
-
-                if (c.running) {
-
-                    remain =
-                        c.expire - Date.now();
-
-                    if (remain <= 0) {
-
-                        remain = 0;
-
-                        c.running = false;
-                        c.expire = null;
-                        c.remainMs = 0;
-
-                        saveData();
-
-                    }
-
-                } else {
-
-                    remain = c.remainMs;
-
-                }
+            filtered.forEach(({ c, i }) => {
 
                 if (!c.packageName) {
-
-                    if (c.duration == 1) {
-
-                        c.packageName = "รายวัน";
-
-                    } else if (c.duration == 5) {
-
-                        c.packageName = "ราย 5 วัน";
-
-                    } else {
-
-                        c.packageName = "รายรี";
-
-                    }
-
+                    if (c.duration == 1) c.packageName = "รายวัน";
+                    else if (c.duration == 5) c.packageName = "ราย 5 วัน";
+                    else c.packageName = "รายรีแช่";
                 }
 
-                let status;
-
-                if (remain <= 0) {
-
-                    status =
-                        '<span class="expired">หมดอายุ</span>';
-
-                } else if (c.running) {
-
-                    status =
-                        '<span class="active">กำลังใช้งาน</span>';
-
-                } else {
-
-                    status =
-                        '<span class="paused">รอเริ่ม</span>';
-
-                }
+                const statusClass = c.status === 'renting' ? 'status-renting' : c.status === 'expired' ? 'status-expired' : 'status-none';
+                const statusLabel = c.status === 'renting' ? '🟢 เช่าอยู่' : c.status === 'expired' ? '🔴 หมดเวลา' : '⚪ ยังไม่เลือก';
 
                 html += `
-
-<tr>
-
-<td>${c.name}</td>
-
-<td>${c.number}</td>
-
-<td>${c.packageName}</td>
-
-<td>${c.days ? (c.days.length === 5 ? 'วันที่ 1-5' : 'วันที่ ' + c.days.join(', ')) : '-'}</td>
-
-<td>
-<button
-class="${c.status === 'renting' ? 'status-renting' : c.status === 'expired' ? 'status-expired' : 'status-none'}"
-onclick="toggleStatus(${index})">
-${c.status === 'renting' ? '🟢 เช่าอยู่' : c.status === 'expired' ? '🔴 หมดเวลา' : '⚪ ยังไม่เลือก'}
-</button>
-</td>
-
-<td>
-
-<div class="action-buttons">
-
-<button
-class="delete-btn"
-onclick="deleteCustomer(${index})">
-❌ ลบ
-</button>
-
-</div>
-
-</td>
-
-</tr>
-
-`;
-
+                <tr>
+                    <td>${c.name}</td>
+                    <td>${c.number}</td>
+                    <td>${c.packageName}</td>
+                    <td><button class="${statusClass}" onclick="toggleStatus(${i})">${statusLabel}</button></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="delete-btn" onclick="deleteCustomer(${i})">❌ ลบ</button>
+                        </div>
+                    </td>
+                </tr>`;
             });
 
-            document.getElementById(
-                "tableBody"
-            ).innerHTML = html;
+            if (filtered.length === 0) {
+                html = `<tr><td colspan="5" style="color:#9ca3af;padding:20px;">ยังไม่มีลูกค้าในวันที่ ${selectedDay}</td></tr>`;
+            }
 
-            document.getElementById(
-                "totalUsers"
-            ).textContent =
-                customers.length;
+            document.getElementById("tableBody").innerHTML = html;
+
+            document.getElementById("totalUsers").textContent = customers.length;
 
             renderZooStatus();
 
