@@ -202,6 +202,28 @@
             border: none;
             cursor: pointer;
         }
+
+        .sent-btn {
+            background: #22c55e;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .not-sent-btn {
+            background: #d1d5db;
+            color: #374151;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+        }
         .action-buttons {
             display: flex;
             gap: 5px;
@@ -537,6 +559,7 @@
                         <th>เบอร์ไอดี</th>
                         <th>แพ็กเกจ</th>
                         <th>สถานะ</th>
+                        <th>ส่งรหัส</th>
                         <th>ควบคุม</th>
                     </tr>
                 </thead>
@@ -975,6 +998,11 @@
             render();
         }
 
+        function toggleSent(index) {
+            customers[index].sent = !customers[index].sent;
+            saveData();
+        }
+
         function toggleStatus(index) {
             const c = customers[index];
             if (!c.status || c.status === 'none') {
@@ -1019,6 +1047,7 @@
                     <td>${c.number}</td>
                     <td>${c.packageName}</td>
                     <td><button class="${statusClass}" onclick="toggleStatus(${i})">${statusLabel}</button></td>
+                    <td><button class="${c.sent ? 'sent-btn' : 'not-sent-btn'}" onclick="toggleSent(${i})">${c.sent ? '✅ ส่งแล้ว' : '📨 ยังไม่ส่ง'}</button></td>
                     <td>
                         <div class="action-buttons">
                             <button class="delete-btn" onclick="deleteCustomer(${i})">❌ ลบ</button>
